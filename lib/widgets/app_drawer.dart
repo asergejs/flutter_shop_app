@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shop/screens/orders_screen.dart';
 import 'package:shop/screens/user_products_screen.dart';
+import 'package:http/http.dart' as http;
+
 
 class AppDrawer extends StatelessWidget {
   @override
@@ -35,7 +37,15 @@ class AppDrawer extends StatelessWidget {
             onTap: () {
               Navigator.of(context).pushReplacementNamed(UserProductsScreen.routeName);
             },
-          )
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.edit),
+            title: Text('Test request'),
+            onTap: () {
+              http.get("http://localhost:8080/api/test");
+            },
+          ),
         ],
       ),
     );
