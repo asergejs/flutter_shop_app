@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:shop/models/product.dart';
 import 'package:shop/providers/products_provider.dart';
 
-
 class EditProductScreen extends StatefulWidget {
   static const routeName = '/edit-product';
 
@@ -31,6 +30,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     'imageUrl': '',
   };
   var _isInit = true;
+  var _isLoading = false;
 
   @override
   void initState() {
@@ -41,10 +41,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
   @override
   void didChangeDependencies() {
     if (_isInit) {
-      final productId = ModalRoute.of(context).settings.arguments as String;
+      final productId = ModalRoute
+          .of(context)
+          .settings
+          .arguments as String;
       if (productId != null) {
-        _editedProduct =
-            Provider.of<ProductsProvider>(context, listen: false).findById(productId);
+        _editedProduct = Provider.of<ProductsProvider>(context, listen: false)
+            .findById(productId);
         _initValues = {
           'title': _editedProduct.title,
           'description': _editedProduct.description,
@@ -88,13 +91,28 @@ class _EditProductScreenState extends State<EditProductScreen> {
       return;
     }
     _form.currentState.save();
+
+    setState(() {
+      _isLoading = true;
+    });
+
     if (_editedProduct.id != null) {
       Provider.of<ProductsProvider>(context, listen: false)
           .updateProduct(_editedProduct.id, _editedProduct);
+      Navigator.of(context).pop();
+      setState(() {
+        _isLoading = false;
+      });
     } else {
-      Provider.of<ProductsProvider>(context, listen: false).addProduct(_editedProduct);
+      Provider.of<ProductsProvider>(context, listen: false)
+          .addProduct(_editedProduct)
+          .then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+        Navigator.of(context).pop();
+      });
     }
-    Navigator.of(context).pop();
   }
 
   @override
@@ -109,7 +127,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
           ),
         ],
       ),
-      body: Padding(
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator(),)
+          : Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _form,

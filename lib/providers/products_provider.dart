@@ -39,10 +39,10 @@ class ProductsProvider with ChangeNotifier {
     return items.where((item) => item.isFavorite).toList();
   }
 
-  void addProduct(Product product) {
+  Future<void> addProduct(Product product) {
     const url =
         'https://flutter-backend-24dea-default-rtdb.europe-west1.firebasedatabase.app/products.json';
-    http
+    return http
         .post(url,
             body: json.encode({
               'title': product.title,
