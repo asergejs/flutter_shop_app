@@ -116,7 +116,18 @@ class ProductsProvider with ChangeNotifier {
   }
 
   void deleteProduct(String id) {
+    final url =
+        'https://flutter-backend-24dea-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json';
+    final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
+    var existingProduct = _items[existingProductIndex];
     _items.removeWhere((prod) => prod.id == id);
+    http.delete(url)
+        .then((_) {
+          existingProduct = null;
+    })
+        .catchError((_) {
+      _items.insert(existingProductIndex, existingProduct);
+    });
     notifyListeners();
   }
 }
