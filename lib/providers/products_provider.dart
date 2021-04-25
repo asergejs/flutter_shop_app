@@ -39,6 +39,18 @@ class ProductsProvider with ChangeNotifier {
     return items.where((item) => item.isFavorite).toList();
   }
 
+  Future<void> fetchAndSetProducts() async {
+    const url =
+        'https://flutter-backend-24dea-default-rtdb.europe-west1.firebasedatabase.app/products.json';
+    try {
+      final response = await http.get(url,);
+      print(json.decode(response.body));
+    } catch (error) {
+      throw (error);
+    }
+
+  }
+
   Future<void> addProduct(Product product) {
     const url =
         'https://flutter-backend-24dea-default-rtdb.europe-west1.firebasedatabase.app/products.json';
