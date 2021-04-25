@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 
 class ProductsProvider with ChangeNotifier {
   List<Product> _items = [];
+
   //   Product(
   //     id: 'p1',
   //     title: 'Red Shirt',
@@ -43,25 +44,25 @@ class ProductsProvider with ChangeNotifier {
     const url =
         'https://flutter-backend-24dea-default-rtdb.europe-west1.firebasedatabase.app/products.json';
     try {
-      final response = await http.get(url,);
+      final response = await http.get(
+        url,
+      );
       final extractedDate = json.decode(response.body) as Map<String, dynamic>;
       final List<Product> loadedProducts = [];
       extractedDate.forEach((prodId, prodData) {
-       loadedProducts.add(Product(
-         id: prodId,
-         title: prodData['title'],
-         description: prodData['description'],
-         isFavorite: prodData['isFavorite'],
-         price: prodData['price'],
-         imageUrl: prodData['imageUrl']
-       ));
+        loadedProducts.add(Product(
+            id: prodId,
+            title: prodData['title'],
+            description: prodData['description'],
+            isFavorite: prodData['isFavorite'],
+            price: prodData['price'],
+            imageUrl: prodData['imageUrl']));
       });
       _items = loadedProducts;
       notifyListeners();
     } catch (error) {
       throw (error);
     }
-
   }
 
   Future<void> addProduct(Product product) {
@@ -91,9 +92,18 @@ class ProductsProvider with ChangeNotifier {
     });
   }
 
-  void updateProduct(String id, Product newProduct) {
+  Future<void> updateProduct(String id, Product newProduct) async {
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
     if (prodIndex >= 0) {
+      final url =
+          'https://flutter-backend-24dea-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json';
+      await http.patch(url,
+          body: json.encode({
+            'title': newProduct.title,
+            'description': newProduct.description,
+            'imageUrl': newProduct.imageUrl,
+            'price': newProduct.price
+          }));
       _items[prodIndex] = newProduct;
       notifyListeners();
     } else {
